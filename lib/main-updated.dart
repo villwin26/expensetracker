@@ -9,8 +9,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
-import '../widgets/custom_error_widget.dart';
+
 import '../core/app_export.dart';
+import '../widgets/custom_error_widget.dart';
 
 var backendURL = "https://expensetra4327back.builtwithrocket.new/log-error";
 
@@ -40,21 +41,22 @@ class MyApp extends StatelessWidget {
     return Sizer(builder: (context, orientation, screenType) {
       return MaterialApp(
         navigatorObservers: [routeObserver],
-        title: 'flutter_template',
+        title: 'expensetracker',
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.light,
         // 🚨 CRITICAL: NEVER REMOVE OR MODIFY
         builder: (context, child) {
           return CustomWidgetInspector(
-              child: TrackingWidget(
-                  child: MediaQuery(
+             child: TrackingWidget(
+            child: MediaQuery(
             data: MediaQuery.of(context).copyWith(
               textScaler: TextScaler.linear(1.0),
-            ),
+      ),
             child: child!,
           ) // Preserve original MediaQuery content
-                  ));
+          )
+        );
         },
         // 🚨 END CRITICAL SECTION
         debugShowCheckedModeBanner: false,
@@ -64,89 +66,86 @@ class MyApp extends StatelessWidget {
     });
   }
 }
-
 final ValueNotifier<String> currentPageNotifier = ValueNotifier<String>('');
 
 class MyRouteObserver extends RouteObserver<PageRoute<dynamic>> {
-  void _updateCurrentPage(Route<dynamic>? route) {
-    if (route is PageRoute) {
-      currentPageNotifier.value = route.settings.name ?? '';
-    }
-  }
+          void _updateCurrentPage(Route<dynamic>? route) {
+            if (route is PageRoute) {
+              currentPageNotifier.value = route.settings.name ?? '';
+            }
+          }
 
-  @override
-  void didPush(Route route, Route? previousRoute) {
-    super.didPush(route, previousRoute);
-    _updateCurrentPage(route);
-  }
+          @override
+          void didPush(Route route, Route? previousRoute) {
+            super.didPush(route, previousRoute);
+            _updateCurrentPage(route);
+          }
 
-  @override
-  void didPop(Route route, Route? previousRoute) {
-    super.didPop(route, previousRoute);
-    _updateCurrentPage(previousRoute);
-  }
+          @override
+          void didPop(Route route, Route? previousRoute) {
+            super.didPop(route, previousRoute);
+            _updateCurrentPage(previousRoute);
+          }
 
-  @override
-  void didReplace({Route? newRoute, Route? oldRoute}) {
-    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
-    _updateCurrentPage(newRoute);
-  }
-}
+          @override
+          void didReplace({Route? newRoute, Route? oldRoute}) {
+            super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+            _updateCurrentPage(newRoute);
+          }
+        }
+        final MyRouteObserver routeObserver = MyRouteObserver();
 
-final MyRouteObserver routeObserver = MyRouteObserver();
 
-void _sendOverflowError(FlutterErrorDetails details) {
-  try {
-    bool hasValidHost = html.window.location.host.isNotEmpty &&
+
+    void _sendOverflowError(FlutterErrorDetails details) {
+      try {
+       bool hasValidHost= html.window.location.host.isNotEmpty &&
         (html.window.location.host.contains('.netlify.app') ||
             html.window.location.host.contains('.public.builtwithrocket.new'));
-    if (hasValidHost) {
-      return;
-    }
-    final errorMessage = details.exception.toString();
-    final exceptionType = details.exception.runtimeType.toString();
-
-    String location = 'Unknown';
-    final locationMatch =
-        RegExp(r'file:///.*\.dart').firstMatch(details.toString());
-    if (locationMatch != null) {
-      location = locationMatch.group(0)?.replaceAll("file://", '') ?? 'Unknown';
-    }
-    String errorType = "RUNTIME_ERROR";
-    if (errorMessage.contains('overflowed by') ||
-        errorMessage.contains('RenderFlex overflowed')) {
-      errorType = 'OVERFLOW_ERROR';
-    }
-    final payload = {
-      'errorType': errorType,
-      'exceptionType': exceptionType,
-      'message': errorMessage,
-      'location': location,
-      'timestamp': DateTime.now().toIso8601String(),
-    };
-    final jsonData = jsonEncode(payload);
-    final request = html.HttpRequest();
-    request.open('POST', backendURL, async: true);
-    request.setRequestHeader('Content-Type', 'application/json');
-    request.onReadyStateChange.listen((_) {
-      if (request.readyState == html.HttpRequest.DONE) {
-        if (request.status == 200) {
-          print('Successfully reported error');
-        } else {
-          print('Error reporting overflow');
+        if (hasValidHost) {
+          return;
         }
-      }
-    });
-    request.onError.listen((event) {
-      print('Failed to send overflow report');
-    });
-    request.send(jsonData);
-  } catch (e) {
-    print('Exception while reporting overflow error: $e');
-  }
-}
+        final errorMessage = details.exception.toString();
+        final exceptionType = details.exception.runtimeType.toString();
 
-class TrackingWidget extends StatefulWidget {
+        String location = 'Unknown';
+        final locationMatch = RegExp(r'file:///.*\.dart').firstMatch(details.toString());
+        if (locationMatch != null) {
+          location = locationMatch.group(0)?.replaceAll("file://", '') ?? 'Unknown';
+        }
+        String errorType = "RUNTIME_ERROR";
+        if(errorMessage.contains('overflowed by') || errorMessage.contains('RenderFlex overflowed')) {
+          errorType = 'OVERFLOW_ERROR';
+        }
+        final payload = {
+          'errorType': errorType,
+          'exceptionType': exceptionType,
+          'message': errorMessage,
+          'location': location,
+          'timestamp': DateTime.now().toIso8601String(),
+        };
+        final jsonData = jsonEncode(payload);
+        final request = html.HttpRequest();
+        request.open('POST', backendURL, async: true);
+        request.setRequestHeader('Content-Type', 'application/json');
+        request.onReadyStateChange.listen((_) {
+          if (request.readyState == html.HttpRequest.DONE) {
+            if (request.status == 200) {
+              print('Successfully reported error');
+            } else {
+              print('Error reporting overflow');
+            }
+          }
+        });
+        request.onError.listen((event) {
+          print('Failed to send overflow report');
+        });
+        request.send(jsonData);
+      } catch (e) {
+        print('Exception while reporting overflow error: $e');
+      }
+    }
+    class TrackingWidget extends StatefulWidget {
   final Widget child;
 
   const TrackingWidget({super.key, required this.child});
@@ -176,7 +175,7 @@ class _TrackingWidgetState extends State<TrackingWidget> {
     });
   }
 
-  String findNearestKnownWidget(Element? element) {
+    String findNearestKnownWidget(Element? element) {
     if (element == null) return 'unknown';
 
     String? foundWidget;
@@ -274,9 +273,9 @@ class _TrackingWidgetState extends State<TrackingWidget> {
 
   void trackInteraction(String eventType, PointerEvent? event) {
     try {
-      //remove focus from the flutter app when mouseleave
-      //added this to fix the issue of the focus not being removed when the mouse leaves the flutter app
-      if (eventType == 'mouseleave') {
+    //remove focus from the flutter app when mouseleave
+    //added this to fix the issue of the focus not being removed when the mouse leaves the flutter app
+    if (eventType == 'mouseleave') {
         Future.delayed(Duration(milliseconds: 300), () {
           FocusScopeNode currentFocus = FocusScope.of(context);
           if (!currentFocus.hasPrimaryFocus &&
@@ -308,11 +307,11 @@ class _TrackingWidgetState extends State<TrackingWidget> {
               widget.child.key?.toString(),
           'position': offset != null
               ? {
-                  'x': offset.dx.round(),
-                  'y': offset.dy.round(),
-                  'width': size?.width.round(),
-                  'height': size?.height.round(),
-                }
+            'x': offset.dx.round(),
+            'y': offset.dy.round(),
+            'width': size?.width.round(),
+            'height': size?.height.round(),
+          }
               : null,
           'viewport': {
             'width': MediaQuery.of(context).size.width.round(),
@@ -324,21 +323,21 @@ class _TrackingWidgetState extends State<TrackingWidget> {
           },
           'mouse': mousePosition != null
               ? {
-                  'viewport': {
-                    'x': mousePosition.dx.round(),
-                    'y': mousePosition.dy.round(),
-                  },
-                  'page': {
-                    'x': (mousePosition.dx + scrollPosition.dx).round(),
-                    'y': (mousePosition.dy + scrollPosition.dy).round(),
-                  },
-                  'element': offset != null
-                      ? {
-                          'x': (mousePosition.dx - offset.dx).round(),
-                          'y': (mousePosition.dy - offset.dy).round(),
-                        }
-                      : null,
-                }
+            'viewport': {
+              'x': mousePosition.dx.round(),
+              'y': mousePosition.dy.round(),
+            },
+            'page': {
+              'x': (mousePosition.dx + scrollPosition.dx).round(),
+              'y': (mousePosition.dy + scrollPosition.dy).round(),
+            },
+            'element': offset != null
+                ? {
+              'x': (mousePosition.dx - offset.dx).round(),
+              'y': (mousePosition.dy - offset.dy).round(),
+            }
+                : null,
+          }
               : null,
         },
         'page': '/#$currentPage',
@@ -397,11 +396,11 @@ class _TrackingWidgetState extends State<TrackingWidget> {
 
   void _onHover(PointerHoverEvent event) {
     final RenderObject? userRender =
-        _childKey.currentContext?.findRenderObject();
+    _childKey.currentContext?.findRenderObject();
     if (userRender == null) return;
 
     final RenderObject? target =
-        _findRenderObjectAtPosition(event.position, userRender);
+    _findRenderObjectAtPosition(event.position, userRender);
 
     if (target != null && target != userRender) {
       if (_selectedRenderObject != target) {
@@ -491,7 +490,7 @@ class _TrackingWidgetState extends State<TrackingWidget> {
           onPanEnd: (_) => trackInteraction('touchend', null),
           child: FocusScope(
             onKeyEvent: (_, event) {
-              if (event is KeyDownEvent) {
+              if(event is KeyDownEvent){
                 trackInteraction('keydown', null);
               }
               return KeyEventResult.ignored;
@@ -504,3 +503,4 @@ class _TrackingWidgetState extends State<TrackingWidget> {
     );
   }
 }
+
