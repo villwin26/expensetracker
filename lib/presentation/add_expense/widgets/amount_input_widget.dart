@@ -30,7 +30,7 @@ class _AmountInputWidgetState extends State<AmountInputWidget> {
   void _addAmount(String amount) {
     final currentText = widget.controller.text;
     final newAmount = currentText.isEmpty
-        ? amount
+        ? double.parse(amount)
         : (double.tryParse(currentText) ?? 0.0) + double.parse(amount);
     widget.controller.text = newAmount.toStringAsFixed(2);
     widget.onAmountChanged(widget.controller.text);
