@@ -4,6 +4,7 @@ import '../presentation/splash_screen/splash_screen.dart';
 import '../presentation/budget_setup/budget_setup.dart';
 import '../presentation/expense_dashboard/expense_dashboard.dart';
 import '../presentation/add_expense/add_expense.dart';
+import '../presentation/registration_screen/registration_screen.dart';
 
 class AppRoutes {
   // TODO: Add your routes here
@@ -13,6 +14,7 @@ class AppRoutes {
   static const String budgetSetup = '/budget-setup';
   static const String expenseDashboard = '/expense-dashboard';
   static const String addExpense = '/add-expense';
+  static const String registrationScreen = '/registration-screen';
 
   static Map<String, WidgetBuilder> routes = {
     initial: (context) => const SplashScreen(),
@@ -21,6 +23,7 @@ class AppRoutes {
     budgetSetup: (context) => const BudgetSetup(),
     expenseDashboard: (context) => const ExpenseDashboard(),
     addExpense: (context) => const AddExpense(),
+    registrationScreen: (context) => const RegistrationScreen(),
     // TODO: Add your other routes here
   };
 }

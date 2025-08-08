@@ -10,12 +10,6 @@ import './widgets/settings_item_widget.dart';
 import './widgets/settings_section_widget.dart';
 import './widgets/settings_toggle_widget.dart';
 import './widgets/user_profile_widget.dart';
-import 'widgets/backup_status_widget.dart';
-import 'widgets/currency_selector_widget.dart';
-import 'widgets/settings_item_widget.dart';
-import 'widgets/settings_section_widget.dart';
-import 'widgets/settings_toggle_widget.dart';
-import 'widgets/user_profile_widget.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
